@@ -119,7 +119,20 @@ npm run serve:ssr:angular-tailwind-ssr
 
 O `build` gera `dist/angular-tailwind-ssr/browser` (cliente) e `dist/angular-tailwind-ssr/server` (servidor). O `serve:ssr` sobe o Express/Node em http://localhost:4000 (porta configurável via `PORT`).
 
-> A aplicação é executada pelo desenvolvedor (Rider/terminal). O backend (`api-base`) precisa estar acessível pelo processo Node do SSR para o `CheckMe` autenticar no servidor — em dev com `https://localhost:8091` (certificado self-signed) pode ser necessário `NODE_EXTRA_CA_CERTS` ou apontar o `apiUrl` para um host alcançável.
+> A aplicação é executada pelo desenvolvedor (Rider/terminal). O backend (`api-base`) precisa estar acessível pelo processo Node do SSR para o `CheckMe` autenticar durante o render.
+>
+> **TLS em dev:** o `apiUrl` de dev é `https://localhost:8091` (certificado self-signed) e o Node rejeita esse certificado por padrão. Para o SSR autenticar em dev, suba o servidor com a flag `SSR_INSECURE_TLS=1` (aceita o cert local **apenas** quando setada — sem default inseguro):
+>
+> ```powershell
+> # PowerShell
+> $env:SSR_INSECURE_TLS = "1"; npm run serve:ssr:angular-tailwind-ssr
+> ```
+> ```bash
+> # bash
+> SSR_INSECURE_TLS=1 npm run serve:ssr:angular-tailwind-ssr
+> ```
+>
+> Alternativa segura: `NODE_EXTRA_CA_CERTS` apontando para o CA do `api-base`. Em **produção** o `apiUrl` é `http://localhost:5000` (sem TLS), então a flag não é necessária — basta o backend estar acessível.
 
 ---
 
