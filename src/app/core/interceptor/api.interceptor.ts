@@ -15,11 +15,19 @@ import { ApiResponse } from '../services/api-response.model';
 import { AuthService } from '../services/auth.service';
 import { RefreshCoordinator } from './refresh-coordinator.service';
 
+function isApiHost(url: string): boolean {
+  try {
+    return new URL(url).host === new URL(environment.apiUrl).host;
+  } catch {
+    return false;
+  }
+}
+
 function toApiRequest(req: HttpRequest<unknown>, serverCookie: string | null): HttpRequest<unknown> {
   const isAbsolute = /^https?:\/\//i.test(req.url);
   const url = isAbsolute ? req.url : `${environment.apiUrl}${req.url}`;
   const apiReq = req.clone({ url, withCredentials: true });
-  if (serverCookie) {
+  if (serverCookie && isApiHost(url)) {
     return apiReq.clone({ setHeaders: { Cookie: serverCookie } });
   }
   return apiReq;

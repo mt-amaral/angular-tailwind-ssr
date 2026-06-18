@@ -52,7 +52,8 @@ export class ThemeService {
   private persist() {
     const value = JSON.stringify(this.theme());
     localStorage.setItem('theme', value);
-    this.document.cookie = `theme=${encodeURIComponent(value)}; path=/; max-age=31536000; SameSite=Lax`;
+    const secure = this.document.location?.protocol === 'https:' ? '; Secure' : '';
+    this.document.cookie = `theme=${encodeURIComponent(value)}; path=/; max-age=31536000; SameSite=Lax${secure}`;
   }
 
   private readServerCookie(name: string): string | null {
@@ -63,7 +64,11 @@ export class ThemeService {
     for (const part of cookies.split(';')) {
       const [key, ...rest] = part.trim().split('=');
       if (key === name) {
-        return decodeURIComponent(rest.join('='));
+        try {
+          return decodeURIComponent(rest.join('='));
+        } catch {
+          return null;
+        }
       }
     }
     return null;
