@@ -1,5 +1,5 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
-import { effect, inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
+import { effect, inject, Injectable, PLATFORM_ID, REQUEST, signal } from '@angular/core';
 import { Theme } from '../models/theme.model';
 
 @Injectable({
@@ -8,6 +8,7 @@ import { Theme } from '../models/theme.model';
 export class ThemeService {
   private readonly document = inject(DOCUMENT);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly serverRequest = inject(REQUEST, { optional: true });
 
   public theme = signal<Theme>({ mode: 'dark' });
 
@@ -19,19 +20,20 @@ export class ThemeService {
   }
 
   private loadTheme() {
-    if (!this.isBrowser) {
-      return;
-    }
-    const theme = localStorage.getItem('theme');
-    if (theme) {
-      this.theme.set(JSON.parse(theme));
+    const stored = this.isBrowser ? localStorage.getItem('theme') : this.readServerCookie('theme');
+    if (stored) {
+      try {
+        this.theme.set(JSON.parse(stored));
+      } catch {
+        this.theme.set({ mode: 'dark' });
+      }
     }
   }
 
   private setConfig() {
     this.setThemeClass();
     if (this.isBrowser) {
-      this.setLocalStorage();
+      this.persist();
     }
   }
 
@@ -47,7 +49,23 @@ export class ThemeService {
     this.document.documentElement.classList.toggle('dark', this.isDark);
   }
 
-  private setLocalStorage() {
-    localStorage.setItem('theme', JSON.stringify(this.theme()));
+  private persist() {
+    const value = JSON.stringify(this.theme());
+    localStorage.setItem('theme', value);
+    this.document.cookie = `theme=${encodeURIComponent(value)}; path=/; max-age=31536000; SameSite=Lax`;
+  }
+
+  private readServerCookie(name: string): string | null {
+    const cookies = this.serverRequest?.headers.get('cookie');
+    if (!cookies) {
+      return null;
+    }
+    for (const part of cookies.split(';')) {
+      const [key, ...rest] = part.trim().split('=');
+      if (key === name) {
+        return decodeURIComponent(rest.join('='));
+      }
+    }
+    return null;
   }
 }

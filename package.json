@@ -8,7 +8,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "prettier": "prettier --config ./.prettierrc --write \"src/{app,environments}/**/*{.ts,.html,.scss,.json}\"",
-    "prettier:verify": "prettier --config ./.prettierrc --check \"src/{app,environments}/**/*{.ts,.html,.scss,.json}\""
+    "prettier:verify": "prettier --config ./.prettierrc --check \"src/{app,environments}/**/*{.ts,.html,.scss,.json}\"",
+    "serve:ssr:angular-tailwind-ssr": "node dist/angular-tailwind-ssr/server/server.mjs"
   },
   "dependencies": {
     "@angular/animations": "21.0.6",
@@ -18,7 +19,9 @@
     "@angular/forms": "21.0.6",
     "@angular/platform-browser": "21.0.6",
     "@angular/platform-browser-dynamic": "21.0.6",
+    "@angular/platform-server": "21.2.17",
     "@angular/router": "21.0.6",
+    "@angular/ssr": "^21.2.16",
     "@ngx-loading-bar/core": "7.0.1",
     "@ngx-loading-bar/http-client": "7.0.1",
     "@ngx-loading-bar/router": "7.0.1",
@@ -28,6 +31,7 @@
     "@tailwindcss/postcss": "4.1.18",
     "@tailwindcss/typography": "0.5.16",
     "@tanstack/angular-query-experimental": "5.101.0",
+    "express": "^5.1.0",
     "primeicons": "7.0.0",
     "primeng": "21.1.9",
     "rxjs": "7.8.2",
@@ -39,7 +43,8 @@
     "@angular/build": "21.2.16",
     "@angular/cli": "21.2.16",
     "@angular/compiler-cli": "21.2.17",
-    "@types/node": "25.9.3",
+    "@types/express": "^5.0.1",
+    "@types/node": "^20.17.19",
     "autoprefixer": "10.4.21",
     "postcss": "8.5.15",
     "prettier": "3.7.4",

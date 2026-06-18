@@ -5,36 +5,46 @@ import {
   HttpRequest,
   HttpResponse,
 } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { inject, PLATFORM_ID, REQUEST } from '@angular/core';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
-import { BehaviorSubject, catchError, filter, Observable, switchMap, take, tap, throwError } from 'rxjs';
+import { catchError, filter, Observable, switchMap, take, tap, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { ApiResponse } from '../services/api-response.model';
 import { AuthService } from '../services/auth.service';
+import { RefreshCoordinator } from './refresh-coordinator.service';
 
-let isRefreshing = false;
-const refreshResult$ = new BehaviorSubject<boolean | null>(null);
-
-function toApiRequest(req: HttpRequest<unknown>): HttpRequest<unknown> {
+function toApiRequest(req: HttpRequest<unknown>, serverCookie: string | null): HttpRequest<unknown> {
   const isAbsolute = /^https?:\/\//i.test(req.url);
   const url = isAbsolute ? req.url : `${environment.apiUrl}${req.url}`;
-  return req.clone({ url, withCredentials: true });
+  const apiReq = req.clone({ url, withCredentials: true });
+  if (serverCookie) {
+    return apiReq.clone({ setHeaders: { Cookie: serverCookie } });
+  }
+  return apiReq;
 }
 
 export const apiInterceptor: HttpInterceptorFn = (req, next) => {
   const messageService = inject(MessageService);
   const router = inject(Router);
   const auth = inject(AuthService);
+  const refresh = inject(RefreshCoordinator);
+  const isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  const serverRequest = isBrowser ? null : inject(REQUEST, { optional: true });
+  const serverCookie = serverRequest?.headers.get('cookie') ?? null;
 
-  const apiReq = toApiRequest(req);
+  const apiReq = toApiRequest(req, serverCookie);
   const isRefreshRequest = apiReq.url.includes('/Account/Refresh');
   const isLoginRequest = apiReq.url.includes('/Account/Login');
   const isSessionProbe = apiReq.url.includes('/Account/CheckMe');
   const isSilentAuth = isRefreshRequest;
 
   const successToast = tap<HttpEvent<unknown>>((event) => {
-    if (event instanceof HttpResponse && !isSilentAuth) {
+    if (!isBrowser || isSilentAuth) {
+      return;
+    }
+    if (event instanceof HttpResponse) {
       const message = (event.body as ApiResponse<unknown> | null)?.message;
       if (message) {
         messageService.add({ severity: 'success', summary: 'Sucesso', detail: message });
@@ -43,7 +53,7 @@ export const apiInterceptor: HttpInterceptorFn = (req, next) => {
   });
 
   const errorToast = (error: HttpErrorResponse): Observable<never> => {
-    if (!isSilentAuth) {
+    if (isBrowser && !isSilentAuth) {
       const message = (error.error as ApiResponse<unknown> | null)?.message;
       if (message) {
         if (error.status >= 400 && error.status < 500) {
@@ -59,30 +69,30 @@ export const apiInterceptor: HttpInterceptorFn = (req, next) => {
   const retryWithToasts = (): Observable<HttpEvent<unknown>> => next(apiReq).pipe(successToast, catchError(errorToast));
 
   const handleUnauthorized = (): Observable<HttpEvent<unknown>> => {
-    if (isRefreshing) {
-      return refreshResult$.pipe(
+    if (refresh.isRefreshing) {
+      return refresh.result$.pipe(
         filter((done): done is boolean => done !== null),
         take(1),
         switchMap((ok) => (ok ? retryWithToasts() : throwError(() => new Error('Sessão expirada.')))),
       );
     }
 
-    isRefreshing = true;
-    refreshResult$.next(null);
+    refresh.isRefreshing = true;
+    refresh.result$.next(null);
 
     return auth.refresh().pipe(
       catchError((refreshError) => {
-        isRefreshing = false;
-        refreshResult$.next(false);
+        refresh.isRefreshing = false;
+        refresh.result$.next(false);
         auth.clearAuth();
-        if (!isSessionProbe && router.url !== '/auth/sign-in') {
+        if (isBrowser && !isSessionProbe && router.url !== '/auth/sign-in') {
           router.navigateByUrl('/auth/sign-in');
         }
         return throwError(() => refreshError);
       }),
       switchMap(() => {
-        isRefreshing = false;
-        refreshResult$.next(true);
+        refresh.isRefreshing = false;
+        refresh.result$.next(true);
         return retryWithToasts();
       }),
     );

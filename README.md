@@ -1,13 +1,21 @@
-# SPA Client-side em Angular
+# SSR (Server-Side Rendering) em Angular
 
-Projeto simples de autenticação, navegação, listagens e telas administrativas. A base está montada em **Angular 21 + TypeScript** (standalone, zoneless), usando **PrimeNG**, **Tailwind CSS v4**, **TanStack Query (Angular)** e **Zod**. Versão Angular do `app-base` (React).
-
-<img alt="Home" src="docs/home.png" width="100%">
-<img alt="Sign in" src="docs/sign-in.png" width="100%">
+Versão **SSR** do template [angular-tailwind](https://github.com/mt-amaral/angular-tailwind): mesma ideia, padrão, cores e componentes, porém **renderizada no servidor** (Angular SSR + Node/Express) em vez de client-side. Stack: **Angular 21 + TypeScript** (standalone, zoneless), **PrimeNG**, **Tailwind CSS v4**, **TanStack Query (Angular)** e **Zod**.
 
 ### Backend
 
 - Backend usado: https://github.com/mt-amaral/api-base
+
+---
+
+# O que muda no SSR (vs. angular-tailwind)
+
+- Bootstrap via `app.config.ts` + `app.routes.ts` (`provideRouter`), com `provideClientHydration(withEventReplay())`; no servidor, `provideServerRendering(withRoutes(serverRoutes))`.
+- Arquivos de servidor: `src/main.server.ts`, `src/app/app.config.server.ts`, `src/app/app.routes.server.ts` (rotas em `RenderMode.Server`) e `src/server.ts` (Express + `AngularNodeAppEngine`).
+- **Auth no servidor**: o interceptor encaminha o header `Cookie` do request recebido (token `REQUEST`) para a API, então `CheckMe`/guards autenticam durante o SSR.
+- **Browser-safety**: `ThemeService` e `LayoutComponent` usam `inject(DOCUMENT)` + `isPlatformBrowser`/`afterNextRender`; o estado de refresh do interceptor foi isolado por request (`RefreshCoordinator`) para não vazar entre usuários no servidor.
+- **Tema sem flash**: o tema é lido de cookie no servidor (classe `.dark` já vem no HTML renderizado); no browser persiste em `localStorage` + cookie.
+- App **zoneless** mantido (sem `zone.js`); `polyfills.ts` removido.
 
 ---
 
@@ -93,22 +101,25 @@ Tipos compartilhados: `ApiResponse<T>`, `PagedResponse<T>`, `PaginationRequest`.
 
 ## Como rodar
 
-### Opção 1: rodar com npm
+### Dev (com SSR)
 
 ```bash
 npm install
 npm start
 ```
 
-A aplicação sobe pelo `ng serve` na porta **5173** (definida no `angular.json`) → http://localhost:5173.
+O `ng serve` na porta **5173** (definida no `angular.json`) já renderiza no servidor em desenvolvimento → http://localhost:5173.
 
-Build de produção:
+### Produção (build + servidor Node)
 
 ```bash
 npm run build
+npm run serve:ssr:angular-tailwind-ssr
 ```
 
-Saída em `dist/`.
+O `build` gera `dist/angular-tailwind-ssr/browser` (cliente) e `dist/angular-tailwind-ssr/server` (servidor). O `serve:ssr` sobe o Express/Node em http://localhost:4000 (porta configurável via `PORT`).
+
+> A aplicação é executada pelo desenvolvedor (Rider/terminal). O backend (`api-base`) precisa estar acessível pelo processo Node do SSR para o `CheckMe` autenticar no servidor — em dev com `https://localhost:8091` (certificado self-signed) pode ser necessário `NODE_EXTRA_CA_CERTS` ou apontar o `apiUrl` para um host alcançável.
 
 ---
 

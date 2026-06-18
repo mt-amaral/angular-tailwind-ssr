@@ -11,6 +11,7 @@ import { providePrimeNG } from 'primeng/config';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { apiInterceptor } from './core/interceptor/api.interceptor';
+import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
 const AppPreset = definePreset(Material, {
   semantic: {
@@ -70,5 +71,6 @@ export const appConfig: ApplicationConfig = {
         },
       },
     }),
+    provideClientHydration(withEventReplay()),
   ],
 };
