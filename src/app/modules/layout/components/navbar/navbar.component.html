@@ -1,0 +1,23 @@
+<div class="bg-background border-border border-b">
+  <div class="flex items-center gap-2 px-4 py-2.5">
+    <p-button
+      icon="pi pi-bars"
+      severity="secondary"
+      [text]="true"
+      styleClass="lg:hidden"
+      (onClick)="mobileVisible = true" />
+    <div class="flex items-center gap-2 lg:hidden">
+      <span class="bg-primary flex items-center justify-center rounded-sm p-1.5">
+        <i class="pi pi-bolt text-primary-foreground text-sm"></i>
+      </span>
+      <b class="text-foreground text-sm font-bold">Angular Tailwind</b>
+    </div>
+    <div class="ml-auto">
+      <app-theme-switch />
+    </div>
+  </div>
+</div>
+
+<p-drawer [(visible)]="mobileVisible" header="Menu" styleClass="!w-72">
+  <app-menu />
+</p-drawer>

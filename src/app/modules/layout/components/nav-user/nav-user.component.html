@@ -1,0 +1,13 @@
+<button
+  type="button"
+  (click)="menu.toggle($event)"
+  class="hover:bg-card flex w-full items-center gap-2 rounded-md p-2 text-left transition-colors">
+  <p-avatar [label]="initials()" shape="circle" styleClass="bg-primary text-primary-foreground shrink-0" />
+  <div class="min-w-0 flex-1">
+    <p class="text-foreground truncate text-sm font-semibold">{{ name() }}</p>
+    <p class="text-muted-foreground truncate text-xs">{{ email() }}</p>
+  </div>
+  <i class="pi pi-angle-up text-muted-foreground text-xs"></i>
+</button>
+
+<p-menu #menu [model]="items" [popup]="true" appendTo="body" />

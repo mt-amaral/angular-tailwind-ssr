@@ -1,0 +1,36 @@
+@if (root && item.children) {
+  <button type="button" (click)="toggle()" class="menu-link">
+    <span class="menu-icon"><i [class]="item.icon"></i></span>
+    <span class="menu-text">{{ item.name }}</span>
+    <span class="menu-toggle">
+      <i class="pi pi-angle-down menu-toggle-icon" [class.rotated]="expanded"></i>
+    </span>
+  </button>
+}
+
+@if (item.routerLink) {
+  <a
+    [routerLink]="item.routerLink"
+    routerLinkActive="router-link-active"
+    [routerLinkActiveOptions]="{ exact: true }"
+    class="menu-link">
+    @if (item.icon && root) {
+      <span class="menu-icon"><i [class]="item.icon"></i></span>
+    }
+    <span class="menu-text">{{ item.name }}</span>
+  </a>
+}
+
+@if (!root && item.children) {
+  <span class="menu-child-category">{{ item.name }}</span>
+}
+
+@if (item.children) {
+  <div class="menu-children" [class.collapsed]="root && !expanded">
+    <ol>
+      @for (child of item.children; track child.name) {
+        <li app-menu-item [item]="child" [root]="false"></li>
+      }
+    </ol>
+  </div>
+}

@@ -1,0 +1,51 @@
+{
+  "name": "angular-tailwind-ssr",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "prettier": "prettier --config ./.prettierrc --write \"src/{app,environments}/**/*{.ts,.html,.scss,.json}\"",
+    "prettier:verify": "prettier --config ./.prettierrc --check \"src/{app,environments}/**/*{.ts,.html,.scss,.json}\""
+  },
+  "dependencies": {
+    "@angular/animations": "21.0.6",
+    "@angular/common": "21.2.17",
+    "@angular/compiler": "21.2.17",
+    "@angular/core": "21.2.17",
+    "@angular/forms": "21.0.6",
+    "@angular/platform-browser": "21.0.6",
+    "@angular/platform-browser-dynamic": "21.0.6",
+    "@angular/router": "21.0.6",
+    "@ngx-loading-bar/core": "7.0.1",
+    "@ngx-loading-bar/http-client": "7.0.1",
+    "@ngx-loading-bar/router": "7.0.1",
+    "@primeuix/themes": "2.0.3",
+    "@tailwindcss/aspect-ratio": "0.4.2",
+    "@tailwindcss/forms": "0.5.10",
+    "@tailwindcss/postcss": "4.1.18",
+    "@tailwindcss/typography": "0.5.16",
+    "@tanstack/angular-query-experimental": "5.101.0",
+    "primeicons": "7.0.0",
+    "primeng": "21.1.9",
+    "rxjs": "7.8.2",
+    "tailwindcss-primeui": "0.6.1",
+    "tslib": "2.8.1",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@angular/build": "21.2.16",
+    "@angular/cli": "21.2.16",
+    "@angular/compiler-cli": "21.2.17",
+    "@types/node": "25.9.3",
+    "autoprefixer": "10.4.21",
+    "postcss": "8.5.15",
+    "prettier": "3.7.4",
+    "prettier-plugin-tailwindcss": "0.7.2",
+    "tailwind-scrollbar": "4.0.2",
+    "tailwindcss": "4.1.18",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,120 @@
+:host {
+  display: block;
+}
+
+.menu-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 1px;
+  border: 0;
+  background: transparent;
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+}
+
+.menu-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.menu-icon i {
+  color: var(--foreground);
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.menu-text {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.menu-toggle-icon {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.menu-toggle-icon.rotated {
+  transform: rotate(180deg);
+}
+
+/* root hover — only the icon color + chevron react */
+:host(.is-root) .menu-link:hover .menu-icon i {
+  color: var(--primary);
+}
+
+:host(.is-root) .menu-link:hover .menu-toggle-icon {
+  color: var(--foreground);
+}
+
+/* root active */
+.menu-link.router-link-active {
+  color: var(--primary);
+}
+
+.menu-link.router-link-active .menu-icon i {
+  color: var(--primary);
+}
+
+/* children */
+.menu-children > ol {
+  list-style: none;
+  margin: 0 1rem 0 0;
+  padding: 0.25rem 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-children.collapsed {
+  display: none;
+}
+
+:host(.is-child) .menu-link {
+  border-inline-start: 1px solid var(--border);
+  border-radius: 0;
+  padding: 0.5rem;
+  padding-inline-start: 1rem;
+  font-weight: 450;
+  color: var(--muted-foreground);
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+:host(.is-child) .menu-link:hover {
+  border-inline-start-color: var(--muted-foreground);
+}
+
+:host(.is-child) .menu-link.router-link-active {
+  color: var(--primary);
+  border-inline-start-color: var(--primary);
+}
+
+.menu-child-category {
+  display: flex;
+  padding: 0.5rem 0.5rem 0.5rem 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--muted-foreground);
+}

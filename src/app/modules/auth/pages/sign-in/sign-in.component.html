@@ -1,0 +1,60 @@
+<!-- login form -->
+<form class="my-10 space-y-6" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="text-center">
+    <h2 class="text-foreground mb-1 text-3xl font-semibold">Hello Again <span class="text-primary">!</span></h2>
+    <p class="text-muted-foreground text-sm">Enter your credential to access your account.</p>
+  </div>
+
+  <p-button
+    label="Log in with Google"
+    icon="pi pi-google"
+    severity="secondary"
+    class="w-full"
+    styleClass="w-full"
+    (onClick)="loginWithGoogle()" />
+
+  <div
+    class="before:border-muted after:border-muted my-4 flex items-center before:mt-0.5 before:flex-1 before:border-t after:mt-0.5 after:flex-1 after:border-t">
+    <p class="text-muted-foreground mx-4 mb-0 text-center text-sm">or</p>
+  </div>
+
+  <div class="space-y-4 text-left">
+    <div>
+      <label for="email" class="text-muted-foreground mb-1 block text-sm">Email address</label>
+      <input pInputText id="email" type="email" formControlName="email" class="w-full" />
+      @if (submitted && f['email'].errors) {
+        <small class="text-red-500">
+          @if (f['email'].errors['required']) { Required field }
+          @else if (f['email'].errors['email']) { Enter a valid email }
+        </small>
+      }
+    </div>
+
+    <div>
+      <label for="password" class="text-muted-foreground mb-1 block text-sm">Password</label>
+      <p-password
+        inputId="password"
+        formControlName="password"
+        [toggleMask]="true"
+        [feedback]="false"
+        styleClass="w-full"
+        inputStyleClass="w-full" />
+      @if (submitted && f['password'].errors) {
+        <small class="text-red-500">Required field</small>
+      }
+    </div>
+
+    <div class="flex items-center gap-2">
+      <p-checkbox inputId="rememberMe" formControlName="rememberMe" [binary]="true" />
+      <label for="rememberMe" class="text-muted-foreground text-sm">Remember me</label>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-600">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <p-button label="Sign in" type="submit" [loading]="loading()" class="w-full" styleClass="w-full" />
+  </div>
+</form>
