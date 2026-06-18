@@ -1,11 +1,14 @@
-import { Injectable, signal } from '@angular/core';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
+import { effect, inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 import { Theme } from '../models/theme.model';
-import { effect } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ThemeService {
+  private readonly document = inject(DOCUMENT);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
   public theme = signal<Theme>({ mode: 'dark' });
 
   constructor() {
@@ -16,6 +19,9 @@ export class ThemeService {
   }
 
   private loadTheme() {
+    if (!this.isBrowser) {
+      return;
+    }
     const theme = localStorage.getItem('theme');
     if (theme) {
       this.theme.set(JSON.parse(theme));
@@ -23,8 +29,10 @@ export class ThemeService {
   }
 
   private setConfig() {
-    this.setLocalStorage();
     this.setThemeClass();
+    if (this.isBrowser) {
+      this.setLocalStorage();
+    }
   }
 
   public get isDark(): boolean {
@@ -36,7 +44,7 @@ export class ThemeService {
   }
 
   private setThemeClass() {
-    document.querySelector('html')!.className = this.theme().mode;
+    this.document.documentElement.classList.toggle('dark', this.isDark);
   }
 
   private setLocalStorage() {

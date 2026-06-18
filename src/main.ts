@@ -1,89 +1,15 @@
-import { enableProdMode, importProvidersFrom } from '@angular/core';
-
-import { provideHttpClient, withInterceptors, withInterceptorsFromDi } from '@angular/common/http';
-import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
-import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideLoadingBarInterceptor } from '@ngx-loading-bar/http-client';
-import { provideLoadingBarRouter } from '@ngx-loading-bar/router';
-import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
-import { definePreset } from '@primeuix/themes';
-import Material from '@primeuix/themes/material';
-import { MessageService } from 'primeng/api';
-import { providePrimeNG } from 'primeng/config';
-import { AppRoutingModule } from './app/app-routing.module';
+import { enableProdMode } from '@angular/core';
+import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
-import { apiInterceptor } from './app/core/interceptor/api.interceptor';
+import { appConfig } from './app/app.config';
 import { environment } from './environments/environment';
-import { provideZonelessChangeDetection } from '@angular/core';
-
-const AppPreset = definePreset(Material, {
-  semantic: {
-    primary: {
-      50: '#fff1f2',
-      100: '#ffe4e6',
-      200: '#fecdd3',
-      300: '#fda4af',
-      400: '#fb7185',
-      500: '#f43f5e',
-      600: '#e11d48',
-      700: '#be123c',
-      800: '#9f1239',
-      900: '#881337',
-      950: '#4c0519',
-    },
-    colorScheme: {
-      light: {
-        primary: {
-          color: '{primary.600}',
-          contrastColor: '#ffffff',
-          hoverColor: '{primary.700}',
-          activeColor: '{primary.800}',
-        },
-      },
-      dark: {
-        primary: {
-          color: '{primary.600}',
-          contrastColor: '#ffffff',
-          hoverColor: '{primary.500}',
-          activeColor: '{primary.400}',
-        },
-      },
-    },
-  },
-});
 
 if (environment.production) {
   enableProdMode();
-  //show this warning only on prod mode
-  if (window) {
-    selfXSSWarning();
-  }
+  selfXSSWarning();
 }
 
-bootstrapApplication(AppComponent, {
-  providers: [
-    importProvidersFrom(BrowserModule, AppRoutingModule),
-    provideAnimations(),
-    provideZonelessChangeDetection(),
-    provideHttpClient(withInterceptors([apiInterceptor]), withInterceptorsFromDi()),
-    provideLoadingBarRouter(),
-    provideLoadingBarInterceptor(),
-    provideTanStackQuery(new QueryClient()),
-    MessageService,
-    providePrimeNG({
-      theme: {
-        preset: AppPreset,
-        options: {
-          darkModeSelector: '.dark',
-          cssLayer: {
-            name: 'primeng',
-            order: 'theme, base, primeng, utilities',
-          },
-        },
-      },
-    }),
-  ],
-}).catch((err) => console.error(err));
+bootstrapApplication(AppComponent, appConfig).catch((err) => console.error(err));
 
 function selfXSSWarning() {
   setTimeout(() => {

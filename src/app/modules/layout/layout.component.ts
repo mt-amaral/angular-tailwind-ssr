@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { afterNextRender, Component, inject } from '@angular/core';
 import { Event, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
@@ -9,20 +10,22 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
   styleUrls: ['./layout.component.css'],
   imports: [SidebarComponent, NavbarComponent, RouterOutlet],
 })
-export class LayoutComponent implements OnInit {
+export class LayoutComponent {
+  private readonly router = inject(Router);
+  private readonly document = inject(DOCUMENT);
   private mainContent: HTMLElement | null = null;
 
-  constructor(private router: Router) {
+  constructor() {
+    afterNextRender(() => {
+      this.mainContent = this.document.getElementById('main-content');
+    });
+
     this.router.events.subscribe((event: Event) => {
       if (event instanceof NavigationEnd) {
         if (this.mainContent) {
-          this.mainContent!.scrollTop = 0;
+          this.mainContent.scrollTop = 0;
         }
       }
     });
-  }
-
-  ngOnInit(): void {
-    this.mainContent = document.getElementById('main-content');
   }
 }
